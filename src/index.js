@@ -10,57 +10,70 @@ app.use(express.json());
 // Put your implementation here
 // If necessary to add imports, please do so in the section above
 const users = [];
+
+
+const findUserById = (id) => users.find(u => u.id === id);
+
+// 1. Create a User
 app.post('/users', (req, res) => {
     const { name, email } = req.body;
 
     if (!name || !email) {
-        return res.status(400).json({ error: 'Name and email are required' });
+        return res.status(400).json({ error: 'Both name and email are required!' });
     }
 
-    const newUser = { id: uuidv4(), name, email };
+    const newUser = {
+        id: uuidv4(),
+        name,
+        email
+    };
+
     users.push(newUser);
-    
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
 });
+
+// 2. Retrieve a User
 app.get('/users/:id', (req, res) => {
-    const user = users.find(u => u.id === req.params.id);
-    
+    const user = findUserById(req.params.id);
+
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'The user cannot be found!' });
     }
 
-    res.json(user);
+    return res.status(200).json(user);
 });
+
+// 3. Update a User
 app.put('/users/:id', (req, res) => {
-    const user = users.find(u => u.id === req.params.id);
+    const user = findUserById(req.params.id);
 
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'The user cannot be found!' });
     }
 
     const { name, email } = req.body;
+
     if (!name || !email) {
-        return res.status(400).json({ error: 'Name and email are required' });
+        return res.status(400).json({ error: 'Both name and email are required!' });
     }
 
     user.name = name;
     user.email = email;
 
-    res.json(user);
+    return res.status(200).json(user);
 });
+
+// 4. Delete a User
 app.delete('/users/:id', (req, res) => {
     const index = users.findIndex(u => u.id === req.params.id);
-    
+
     if (index === -1) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'The user cannot be found!' });
     }
 
     users.splice(index, 1);
-    
-    res.status(204).send();
+    return res.status(204).send(); 
 });
-
-
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
